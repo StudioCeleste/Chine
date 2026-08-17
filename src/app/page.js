@@ -15,66 +15,97 @@ export default function Home() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
 
+  const [isSupabaseConfigured, setIsSupabaseConfigured] = useState(false);
+
   useEffect(() => {
-    fetchEvents();
+    // Vérifier si Supabase est configuré avec de vraies clés
+    const hasKeys = process.env.NEXT_PUBLIC_SUPABASE_URL && 
+                    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY && 
+                    !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
+    
+    setIsSupabaseConfigured(hasKeys);
 
-    const channel = supabase
-      .channel('schema-db-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, (payload) => {
-        fetchEvents();
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    if (hasKeys) {
+      fetchEventsSupabase();
+      const channel = supabase
+        .channel('schema-db-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, (payload) => {
+          fetchEventsSupabase();
+        })
+        .subscribe();
+      return () => { supabase.removeChannel(channel); };
+    } else {
+      // Mode Hors-ligne / LocalStorage
+      fetchEventsLocal();
+    }
   }, []);
 
-  const fetchEvents = async () => {
+  const fetchEventsSupabase = async () => {
     const { data, error } = await supabase
       .from('events')
       .select('*')
       .order('date', { ascending: true })
       .order('time', { ascending: true });
-      
-    if (!error && data) {
-      setEvents(data);
+    if (!error && data) setEvents(data);
+  };
+
+  const fetchEventsLocal = () => {
+    const localData = localStorage.getItem('chine_events');
+    if (localData) {
+      const parsed = JSON.parse(localData);
+      // Tri par date et heure
+      parsed.sort((a, b) => {
+        if (a.date === b.date) return a.time.localeCompare(b.time);
+        return a.date.localeCompare(b.date);
+      });
+      setEvents(parsed);
+    } else {
+      // Mock data par défaut si rien en local
+      const mock = [
+        { id: '1', date: '2026-09-01', time: '12:30', title: 'Arrivée à PEK', location: 'Aéroport International de Pékin', completed: true },
+        { id: '2', date: '2026-09-01', time: '15:00', title: 'Cité Interdite', location: 'La Cité interdite', completed: true },
+        { id: '3', date: '2026-09-01', time: '19:00', title: 'Canard Laqué', location: 'Restaurant Quanjude', completed: false },
+        { id: '4', date: '2026-09-02', time: '09:00', title: 'Grande Muraille de Mutianyu', location: 'Mutianyu', completed: false }
+      ];
+      setEvents(mock);
+      localStorage.setItem('chine_events', JSON.stringify(mock));
     }
   };
 
   const handleSaveEvent = async (formData) => {
-    if (editingEvent) {
-      const { error } = await supabase
-        .from('events')
-        .update({
-          ...formData,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', editingEvent.id);
-      if (error) throw error;
+    if (isSupabaseConfigured) {
+      if (editingEvent) {
+        await supabase.from('events').update({ ...formData, updated_at: new Date().toISOString() }).eq('id', editingEvent.id);
+      } else {
+        await supabase.from('events').insert([{ ...formData, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }]);
+      }
+      fetchEventsSupabase();
     } else {
-      const { error } = await supabase
-        .from('events')
-        .insert([{
-          ...formData,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }]);
-      if (error) throw error;
+      // Sauvegarde locale
+      let newEvents;
+      if (editingEvent) {
+        newEvents = events.map(ev => ev.id === editingEvent.id ? { ...ev, ...formData } : ev);
+      } else {
+        newEvents = [...events, { ...formData, id: Date.now().toString(), completed: false }];
+      }
+      localStorage.setItem('chine_events', JSON.stringify(newEvents));
+      fetchEventsLocal();
     }
-    fetchEvents();
   };
 
   const toggleCompleted = async (e, event) => {
     e.stopPropagation();
-    // Optimistic update
-    setEvents(events.map(ev => ev.id === event.id ? { ...ev, completed: !ev.completed } : ev));
-    const { error } = await supabase
-      .from('events')
-      .update({ completed: !event.completed })
-      .eq('id', event.id);
-    if (error) {
-      fetchEvents(); // revert if failed
+    const newCompletedState = !event.completed;
+    
+    // Optimistic update pour l'UI
+    const newEvents = events.map(ev => ev.id === event.id ? { ...ev, completed: newCompletedState } : ev);
+    setEvents(newEvents);
+
+    if (isSupabaseConfigured) {
+      const { error } = await supabase.from('events').update({ completed: newCompletedState }).eq('id', event.id);
+      if (error) fetchEventsSupabase(); // revert
+    } else {
+      localStorage.setItem('chine_events', JSON.stringify(newEvents));
     }
   };
 
