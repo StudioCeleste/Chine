@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import styles from './EventForm.module.css';
+import PhotoUploader from './PhotoUploader';
 
 export default function EventForm({ initialData = null, onClose, onSave }) {
   const [formData, setFormData] = useState({
@@ -84,6 +85,13 @@ export default function EventForm({ initialData = null, onClose, onSave }) {
             <label>Notes Julie</label>
             <textarea name="notes_julie" value={formData.notes_julie} onChange={handleChange} rows="2" placeholder="Notes personnelles..."></textarea>
           </div>
+
+          {initialData && (
+            <div className={styles.formGroup} style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', marginTop: '16px' }}>
+              <label>Souvenirs (Photos)</label>
+              <PhotoUploader eventId={initialData.id} onUploadSuccess={() => alert('Photo ajoutée avec succès !')} />
+            </div>
+          )}
 
           <div className={styles.actions}>
             <button type="button" className={styles.cancelBtn} onClick={onClose} disabled={isSubmitting}>Annuler</button>

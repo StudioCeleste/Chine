@@ -1,0 +1,97 @@
+.albumContainer {
+  padding: 20px;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-secondary);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+.generateBtnContainer {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.generateBtn {
+  background: var(--accent-secondary);
+  color: #000;
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.eventGroup {
+  background: rgba(28, 28, 30, 0.4);
+  border-radius: var(--border-radius-md);
+  padding: 20px;
+  border: 1px solid var(--border);
+}
+
+.eventHeader {
+  margin-bottom: 15px;
+}
+
+.eventHeader h3 {
+  color: var(--accent-primary);
+  margin-bottom: 4px;
+}
+
+.eventHeader span {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.photoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.photoCard {
+  aspect-ratio: 1;
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+  background: #000;
+}
+
+.photoCard img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.eventNotes {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  background: rgba(0,0,0,0.2);
+  padding: 12px;
+  border-radius: var(--border-radius-sm);
+  border-left: 3px solid var(--accent-primary);
+}
+
+.eventNotes p {
+  margin-bottom: 8px;
+}
+
+.eventNotes p:last-child {
+  margin-bottom: 0;
+}

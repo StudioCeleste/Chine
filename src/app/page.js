@@ -1,9 +1,13 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import styles from './page.module.css';
 import { supabase } from '../lib/supabase';
 import EventForm from '../components/EventForm';
+import AlbumView from '../components/AlbumView';
+
+const MapComponent = dynamic(() => import('../components/MapComponent'), { ssr: false });
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('timeline');
@@ -151,14 +155,14 @@ export default function Home() {
         ))}
 
         {activeTab === 'map' && (
-          <div className="animate-fade-in" style={{ padding: '20px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-            <p>Module Cartographie en cours de développement...</p>
+          <div className="animate-fade-in" style={{ height: 'calc(100vh - 180px)', width: '100%', borderRadius: 'var(--border-radius-md)', overflow: 'hidden' }}>
+            <MapComponent events={events} />
           </div>
         )}
 
         {activeTab === 'album' && (
-          <div className="animate-fade-in" style={{ padding: '20px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-            <p>Module Album en cours de développement...</p>
+          <div className="animate-fade-in" style={{ paddingBottom: '100px' }}>
+            <AlbumView events={events} />
           </div>
         )}
       </main>

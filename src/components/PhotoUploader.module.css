@@ -1,0 +1,27 @@
+.uploader {
+  margin-top: 16px;
+}
+
+.uploadBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-sm);
+  color: var(--accent-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.uploadBtn:active {
+  transform: scale(0.98);
+}
+
+.uploadBtn.uploading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
