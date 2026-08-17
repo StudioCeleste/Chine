@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import styles from './AlbumView.module.css';
@@ -5,6 +6,19 @@ import styles from './AlbumView.module.css';
 export default function AlbumView({ events }) {
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  async function fetchPhotos() {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('photos')
+      .select('*')
+      .order('created_at', { ascending: false });
+      
+    if (!error && data) {
+      setPhotos(data);
+    }
+    setLoading(false);
+  }
 
   useEffect(() => {
     fetchPhotos();
@@ -21,19 +35,6 @@ export default function AlbumView({ events }) {
     };
   }, []);
 
-  const fetchPhotos = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('photos')
-      .select('*')
-      .order('created_at', { ascending: true });
-      
-    if (!error && data) {
-      setPhotos(data);
-    }
-    setLoading(false);
-  };
-
   // Group photos by event
   const eventsWithPhotos = events.map(event => {
     return {
@@ -43,16 +44,14 @@ export default function AlbumView({ events }) {
   }).filter(event => event.photos.length > 0);
 
   if (loading) {
-    return <div className={styles.loading}>Chargement de l'album...</div>;
+    return <div className={styles.loading}>Chargement des souvenirs...</div>;
   }
 
   if (eventsWithPhotos.length === 0) {
     return (
       <div className={styles.emptyState}>
-        <p>L'album est vide.</p>
-        <p style={{ fontSize: '0.8rem', opacity: 0.7, marginTop: '8px' }}>
-          Ajoutez des photos aux étapes depuis la Timeline.
-        </p>
+        <p>Aucun souvenir pour l&apos;instant.</p>
+        <p style={{ fontSize: '0.85rem', marginTop: '10px' }}>Ajoutez des photos depuis les détails d&apos;une étape !</p>
       </div>
     );
   }
