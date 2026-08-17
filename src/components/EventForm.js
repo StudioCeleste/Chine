@@ -56,39 +56,39 @@ export default function EventForm({ initialData = null, onClose, onSave }) {
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.formGroup}>
-            <label>Titre</label>
-            <input type="text" name="title" required value={formData.title} onChange={handleChange} placeholder="Ex: Arrivée à PEK" />
+            <label className={styles.label}>Titre</label>
+            <input className={styles.input} type="text" name="title" required value={formData.title} onChange={handleChange} placeholder="Ex: Arrivée à PEK" />
           </div>
 
           <div className={styles.row}>
             <div className={styles.formGroup}>
-              <label>Date</label>
-              <input type="date" name="date" required value={formData.date} onChange={handleChange} />
+              <label className={styles.label}>Date</label>
+              <input className={styles.input} type="date" name="date" required value={formData.date} onChange={handleChange} />
             </div>
             <div className={styles.formGroup}>
-              <label>Heure</label>
-              <input type="time" name="time" required value={formData.time} onChange={handleChange} />
+              <label className={styles.label}>Heure</label>
+              <input className={styles.input} type="time" name="time" required value={formData.time} onChange={handleChange} />
             </div>
           </div>
 
           <div className={styles.formGroup}>
-            <label>Adresse / Coordonnées</label>
-            <input type="text" name="location" value={formData.location} onChange={handleChange} placeholder="Lieu" />
+            <label className={styles.label}>Adresse / Coordonnées</label>
+            <input className={styles.input} type="text" name="location" value={formData.location} onChange={handleChange} placeholder="Lieu" />
           </div>
 
           <div className={styles.formGroup}>
-            <label>Notes Céleste</label>
-            <textarea name="notes_celeste" value={formData.notes_celeste} onChange={handleChange} rows="2" placeholder="Notes personnelles..."></textarea>
+            <label className={styles.label}>Notes Céleste</label>
+            <textarea className={styles.textarea} name="notes_celeste" value={formData.notes_celeste} onChange={handleChange} rows="2" placeholder="Notes personnelles..."></textarea>
           </div>
 
           <div className={styles.formGroup}>
-            <label>Notes Julie</label>
-            <textarea name="notes_julie" value={formData.notes_julie} onChange={handleChange} rows="2" placeholder="Notes personnelles..."></textarea>
+            <label className={styles.label}>Notes Julie</label>
+            <textarea className={styles.textarea} name="notes_julie" value={formData.notes_julie} onChange={handleChange} rows="2" placeholder="Notes personnelles..."></textarea>
           </div>
 
           {initialData && (
             <div className={styles.formGroup} style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', marginTop: '16px' }}>
-              <label>Souvenirs (Photos)</label>
+              <label className={styles.label}>Souvenirs (Photos)</label>
               <PhotoUploader eventId={initialData.id} onUploadSuccess={() => alert('Photo ajoutée avec succès !')} />
             </div>
           )}
