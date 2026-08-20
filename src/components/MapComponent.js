@@ -6,13 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import gcoord from 'gcoord';
 
-// Correction icône Leaflet par défaut
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-});
+// Configuration de l'icône sera faite dans un useEffect
 
 // Composant pour mettre à jour la vue de la carte
 function MapUpdater({ center }) {
@@ -31,6 +25,16 @@ export default function MapComponent({ events }) {
   const watchIdRef = useRef(null);
 
   useEffect(() => {
+    // Correction icône Leaflet par défaut
+    if (typeof window !== 'undefined' && L && L.Icon && L.Icon.Default) {
+      delete L.Icon.Default.prototype._getIconUrl;
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      });
+    }
+
     // Activer la géolocalisation
     if ('geolocation' in navigator) {
       watchIdRef.current = navigator.geolocation.watchPosition(
